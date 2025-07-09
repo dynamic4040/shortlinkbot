@@ -1,6 +1,6 @@
 from flask import Flask, request, redirect, jsonify
 import sqlite3, string, random
-
+import os
 app = Flask(__name__)
 @app.route('/ping')
 def ping():
@@ -66,5 +66,8 @@ def stats(code):
         })
     return jsonify({"error": "Link not found"}), 404
 
+
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))  # get port from Render
+    app.run(host='0.0.0.0', port=port)
