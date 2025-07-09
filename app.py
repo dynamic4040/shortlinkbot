@@ -1,4 +1,5 @@
 from flask import Flask, request, redirect, jsonify
+from flask import url_for
 import sqlite3, string, random
 import os
 app = Flask(__name__)
@@ -27,20 +28,20 @@ def shorten():
     url = request.form.get('url')
     print("Received URL:", url)
     custom = request.form.get('custom')
-    
+
     if not url:
         return "Missing URL", 400
-    
+
     code = custom if custom else generate_code()
-    
+
     cur.execute("SELECT * FROM links WHERE code=?", (code,))
     if cur.fetchone() and not custom:
         code = generate_code()
-    
+
     cur.execute("INSERT OR REPLACE INTO links (code, url, clicks) VALUES (?, ?, 0)", (code, url))
     conn.commit()
-    
-    return f"http://localhost:5000/{code}"
+
+    return url_for('redirect_link', code=code, _external=True)
 
 @app.route('/<code>')
 def redirect_link(code):
